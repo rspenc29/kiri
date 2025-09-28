@@ -1,0 +1,7 @@
+services:
+  kiri:
+    image: ghcr.io/rspenc29/kiri:latest
+    container_name: kiri
+    restart: unless-stopped
+    ports:
+      - 8080:8080

@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kiri
+spec:
+  selector:
+    app: kiri
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kiri
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kiri
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: kiri
+    spec:
+      containers:
+      - name: kiri
+        image: ghcr.io/rspenc29/kiri
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        resources: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kiri
+  annotations:
+    nginx.ingress.kubernetes.io/app-root: /kiri
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - kiri.k1.lan
+      secretName: tls-k1.lan
+  rules:
+  - host: kiri.k1.lan
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: kiri
+            port:
+              name: http
