@@ -1,6 +1,12 @@
 services:
   kiri:
-    image: ghcr.io/rspenc29/kiri:latest
+    image: ghcr.io/rspenc29/kiri:${VERSION:-latest}
+    build:
+      args:
+        - VERSION
+      platforms:
+        - linux/amd64
+        - linux/arm64
     container_name: kiri
     restart: unless-stopped
     ports:
